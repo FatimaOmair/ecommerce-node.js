@@ -10,7 +10,7 @@ export const create = async (req, res) => {
             return res.status(409).json({ message: "Category already exists" });
         }
 
-        const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, { folder: "Fshop/categories" });
+        const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, { folder: `${process.env.APPNAME}/categories` });
 
         const createdBy = req.user._id;
         const UpdatedBy = req.user._id;
@@ -34,7 +34,7 @@ export const create = async (req, res) => {
 
 
 export const getAll=async(req,res)=>{
-    const categories= await categoryModel.find({}) 
+    const categories= await categoryModel.find({}).populate([{path:"createdBy",select:"userName"},{path:"UpdatedBy",select:"userName"},{path:"subCategory"}]) 
     return res.status(200).json({message:"success",categories})
 }
 
@@ -70,7 +70,7 @@ export const getName=async(req,res,next)=>{
         }
 
         if (req.file) {
-            const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, { folder: "Fshop/categories" });
+            const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, { folder: `${process.env.APPNAME}/categories` });
             cloudinary.uploader.destroy(category.image.public_id)
             category.image = { secure_url, public_id };
         }
