@@ -1,5 +1,7 @@
 import connectDB from '../db/connection.js'
 import categoriesRouter from './modules/category/category.router.js'
+import subCategoriesRouter from './modules/subCategory/subCategory.router.js'
+
 import productsRouter from './modules/product/product.router.js'
 import authRouter from './modules/auth/auth.router.js'
 
@@ -12,6 +14,7 @@ const initApp=(app,express)=>{
         return res.status(200).json({message:"success"})
      })
     app.use('/categories',categoriesRouter)
+    app.use('/subCategories',subCategoriesRouter)
     app.use('/auth',authRouter)
     app.use(productsRouter)
 
