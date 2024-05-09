@@ -5,6 +5,8 @@ const router= Router();
 
 router.post('/register', authController.register);
 router.post('/login', authController.login);
+router.patch('/sendCode', authController.sendCode);
+router.patch('/forgetPassword', authController.forgetPassword);
 
 
 
