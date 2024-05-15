@@ -14,6 +14,7 @@ const initApp=(app,express)=>{
         return res.status(200).json({message:"success"})
      })
     app.use('/categories',categoriesRouter)
+    app.use('/product',productsRouter)
     app.use('/subCategories',subCategoriesRouter)
     app.use('/auth',authRouter)
     app.use(productsRouter)

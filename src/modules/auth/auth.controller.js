@@ -3,14 +3,17 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import sendEmail from "../../ults/email.js";
 import { customAlphabet, nanoid } from "nanoid";
+
+
 export const register=async(req, res, next) =>{
    const {userName,email,password} = req.body;
    const user= await userModel.findOne({email})
-   
+  
    if(user){
     return res.status(409).json({meessage:"email already in use"})
    }
 
+  
    const hashedPassword= bcrypt.hashSync(password,parseInt(process.env.SALTROUND))
    const createUser= await userModel.create({userName,email,password:hashedPassword})
    await sendEmail(email, 'welcome',`Hello ${userName}`)
@@ -25,6 +28,11 @@ export const login=async(req,res,next)=>{
    if(!user){
       return res.status(400).json({message:"invalid data"})
    }
+
+   if(!user.confirmEmail){
+      return res.json({message:"plz confiem your email"})
+   }
+
 
    const match=await bcrypt.compare(password,user.password)
    if(user.status=='NOtActive'){

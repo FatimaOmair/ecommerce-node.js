@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
-    "node": "21.1.0"
+    "node": "21.7.3"
   },
   "keywords": [],
   "author": "",
