@@ -1,9 +1,10 @@
 import connectDB from '../db/connection.js'
 import categoriesRouter from './modules/category/category.router.js'
 import subCategoriesRouter from './modules/subCategory/subCategory.router.js'
-
 import productsRouter from './modules/product/product.router.js'
 import authRouter from './modules/auth/auth.router.js'
+import cartRouter from './modules/cart/cart.router.js'
+
 
 import cors from 'cors'
 const initApp=(app,express)=>{
@@ -16,6 +17,7 @@ const initApp=(app,express)=>{
     app.use('/categories',categoriesRouter)
     app.use('/product',productsRouter)
     app.use('/subCategories',subCategoriesRouter)
+    app.use('/cart',cartRouter)
     app.use('/auth',authRouter)
     app.use(productsRouter)
 
