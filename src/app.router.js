@@ -6,7 +6,8 @@ import authRouter from './modules/auth/auth.router.js'
 import couponRouter from './modules/coupon/coupon.router.js'
 import cartRouter from './modules/cart/cart.router.js'
 import orderRouter from './modules/order/order.router.js'
-
+import userRouter from './modules/user/user.router.js'
+import reviewRouter from './modules/review/review.router.js'
 
 
 import cors from 'cors'
@@ -24,6 +25,8 @@ const initApp=(app,express)=>{
     app.use('/coupon',couponRouter)
     app.use('/auth',authRouter)
     app.use('/order',orderRouter)
+    app.use('/user',userRouter)
+    app.use('/review',reviewRouter)
     app.use(productsRouter)
 
     app.use('*',(req,res)=>{
