@@ -89,6 +89,12 @@ const productSchema =new Schema({
 },
 )
 
+productSchema.virtual('reviews',{
+  ref:"Review",
+  localField:"_id",
+  foreignField:"productId"
+})
+
 
 
 const productModel=model('Product',productSchema)
