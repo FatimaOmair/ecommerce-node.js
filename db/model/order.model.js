@@ -8,6 +8,9 @@ const orderSchema =new Schema({
     
    },
    products:[{
+    productName:{
+   type:String
+    },
     productId:{
         type:Types.ObjectId,
         ref:'Product' ,
