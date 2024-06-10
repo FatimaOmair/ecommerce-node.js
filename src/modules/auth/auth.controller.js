@@ -5,20 +5,27 @@ import sendEmail from "../../ults/email.js";
 import { customAlphabet, nanoid } from "nanoid";
 
 
-export const register=async(req, res, next) =>{
-   const {userName,email,password} = req.body;
-   const user= await userModel.findOne({email})
-  
-   if(user){
-    return res.status(409).json({meessage:"email already in use"})
-   }
 
+
+export const register=async(req, res, next) =>{
+   
+   const {userName,email,password} = req.body;
   
    const hashedPassword= bcrypt.hashSync(password,parseInt(process.env.SALTROUND))
    const createUser= await userModel.create({userName,email,password:hashedPassword})
-   await sendEmail(email, 'welcome',`Hello ${userName}`)
+   const token = jwt.sign({email},process.env.CONFIRMSIGN)
+
+   
+    await sendEmail(email,`welcome`,userName,token)
    return res.status(201).json({meessage:"success",user:createUser})
 
+}
+
+export const confirmEmail=async(req, res, next) =>{
+   const token= req.params.token;
+   const decoded= jwt.verify(token,process.env.CONFIRMSIGN)
+await userModel.findOneAndUpdate({email:req.params.email},{confirmEmail:true})
+return res.status(200).json({message:"success"})
 }
 
 export const login=async(req,res,next)=>{
