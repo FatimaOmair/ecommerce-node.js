@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { emialTemplate } from "./EmailTemplate.js";
 
 const sendEmail = async (to, subject,html) => {
   let transporter = nodemailer.createTransport({
@@ -18,7 +19,7 @@ const sendEmail = async (to, subject,html) => {
     from: 'F shop', // Set the sender email address here
     to, // Send the email only to the admin's email address
     subject,
-    html, 
+    html:emialTemplate(to), 
   });
 };
 
