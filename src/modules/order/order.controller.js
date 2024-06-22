@@ -3,7 +3,10 @@ import couponModel from "../../../db/model/coupon.model.js";
 import orderModel from "../../../db/model/order.model.js";
 import productModel from "../../../db/model/product.model.js";
 import userModel from "../../../db/model/user.model.js";
+import Stripe from "stripe";
 
+
+const stripe=new Stripe('sk_test_51PQkLGE32qRADTS19pXPEWuP0KpNfrxU5vSP8ysgy7y7LRgY9U0AiOmjDejRySziESmZnf2pMjwyPD6FuJZvSjnr00qiBUfKdw')
 export const create = async (req, res) => {
     try {
         const { couponName } = req.body;
@@ -48,7 +51,7 @@ export const create = async (req, res) => {
             }
 
             product = product.toObject(); // Convert from BSON to JS object
-            product.name = checkProduct.name;
+            product.productName = checkProduct.name;
             product.discount = checkProduct.discount;
             product.unityPrice = checkProduct.price; // Corrected key name
             product.finalPrice = product.quantity * product.unityPrice; // Corrected calculation
@@ -65,6 +68,22 @@ export const create = async (req, res) => {
         if (!req.body.phoneNumber) {
             req.body.phoneNumber = user.phoneNumber;
         }
+         
+        const session = await stripe.checkout.sessions.create({
+            line_items:[
+                {
+                    price_data:{
+                      currency:'USD',
+                      unit_amount:subTotal - (subTotal * ((req.body.coupon?.amount || 0)) / 100) ,
+                      product_data: {name:user.userName}
+                    },
+                    quantity:1
+                }
+            ],
+            mode:'payment',
+            success_url:"www.facebook.com",
+            cancel_url:'wwww.facebook.com'
+        })
 
         const order = await orderModel.create({
             userId: req.user._id,
@@ -76,6 +95,24 @@ export const create = async (req, res) => {
         });
 
         if (order) {
+
+
+const invoice = {
+  shipping: {
+    name: user.userName,
+    address: order.address,
+    phone:order.phoneNumber
+    
+  },
+  items:order.products,
+  subtotal: order.finalPrice,
+  invoice_nr: order._id
+};
+
+createInvoice(invoice, "invoice.pdf");
+
+
+
             for (const product of req.body.products) {
                 await productModel.findOneAndUpdate(
                     { _id: product.productId },
