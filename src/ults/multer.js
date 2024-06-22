@@ -2,7 +2,8 @@ import multer from 'multer';
 
 export const fileType = {
   image: ['image/jpeg', 'image/svg+xml', 'image/gif'],
-  file: ['application/pdf']
+  pdf: ['application/pdf'],
+  excel:['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
 };
 
 function fileUpload(customValidation = []) {
