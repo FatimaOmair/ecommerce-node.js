@@ -11,6 +11,7 @@ const router= Router();
 
 
 router.post('/register',validation(schema.registerSchema),checkEmail, asyncHandler(authController.register));
+router.post('/Excel',fileUpload(fileType.excel).single('excel'),asyncHandler(authController.addUserExcel))
 router.post('/login',validation(schema.loginSchema), asyncHandler(authController.login));
 router.patch('/sendCode',validation(schema.sendCode), asyncHandler(authController.sendCode));
 router.patch('/forgetPassword',validation(schema.forgotPasswordSchema), asyncHandler(authController.forgetPassword));
