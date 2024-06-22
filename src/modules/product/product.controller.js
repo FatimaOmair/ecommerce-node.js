@@ -35,10 +35,14 @@ req.body.mainImage={secure_url,public_id}
 
 
 req.body.subImages=[]
+
+if (req.files.subImages){
+
+
 for(const file of req.files.subImages){
     const {secure_url,public_id}= await cloudinary.uploader.upload(req.files.mainImage[0].path,{folder:`${process.env.APPNAME}/${name}/subImages`})
     req.body.subImages.push({secure_url,public_id})
-}
+}}
 
 const product =await productModel.create(req.body)
 return res.status(200).json({message:"success",product})
@@ -47,11 +51,11 @@ return res.status(200).json({message:"success",product})
 
 export const getProducts = async (req, res, next) => {
     try {
-        const { page = 1, limit = 2, sort } = req.query;
+        const { page = 1, limit = 2, sort, search, fields } = req.query;
         const { skip, limit: parsedLimit } = pagination(page, limit);
 
         let queryObject = { ...req.query };
-        const excludeQuery = ['page', 'limit', 'sort','search','fields'];
+        const excludeQuery = ['page', 'limit', 'sort', 'search', 'fields'];
 
         excludeQuery.forEach((ele) => {
             delete queryObject[ele];
@@ -64,32 +68,44 @@ export const getProducts = async (req, res, next) => {
         let productsQuery = productModel.find(queryObject)
             .skip(skip)
             .limit(parsedLimit)
-           
             .populate({
                 path: 'reviews',
                 populate: {
                     path: 'userId',
                     select: 'userId -_id'
                 }
-            })
-            .select(req.query.fields);
+            });
 
-        if(req.query.searh){
-            productsQuery.find({
-                $or:[
-                    {name:{$regex:req.query.search},
-                     description:{$regex:req.query.search}}
-                ]
-            })
+        if (fields) {
+            const fieldsArray = fields.split(',').map(field => field.trim()).join(' ');
+            productsQuery = productsQuery.select(fieldsArray);
         }
+
+        if (search) {
+            const searchRegex = new RegExp(search, 'i'); 
+            productsQuery = productsQuery.find({
+                $or: [
+                    { name: { $regex: searchRegex } },
+                    { description: { $regex: searchRegex } }
+                ]
+            });
+        }
+
         if (sort) {
             const sortFields = sort.split(',').map(field => field.trim()).join(' ');
             productsQuery = productsQuery.sort(sortFields);
+        } else {
+            productsQuery = productsQuery.sort('createdAt'); 
         }
 
         const products = await productsQuery;
+        const transformedProducts = products.map(product => ({
+            ...product.toObject(),
+            mainImage: product.mainImage.secure_url,
+            subImages: product.subImages.map(img => img.secure_url)
+        }));
 
-        return res.status(200).json({ message: "success", products });
+        return res.status(200).json({ message: "success", products: transformedProducts });
     } catch (error) {
         next(error);
     }
