@@ -2,10 +2,13 @@ export const validation=(schema)=>{
 
 
     return (req,res,next)=>{
+        let filterData={}
         const errorMessage=[];
-        let filterData ={...req.body,...req.params,...req.query}
         if(req.file){
-            filterData.image=req.file
+            filterData ={image:req.file,...req.body,...req.params,...req.query}
+        }else if(req.files){
+            filterData ={...req.file,...req.body,...req.params,...req.query}
+
         }
         const {error}=schema.validate(filterData,{abortEarly:false});
         if(error){
