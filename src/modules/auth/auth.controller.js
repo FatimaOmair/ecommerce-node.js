@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import sendEmail from "../../ults/email.js";
 import { customAlphabet, nanoid } from "nanoid";
-
+import xlsx from "xlsx";
 
 
 
@@ -19,6 +19,14 @@ export const register=async(req, res, next) =>{
     await sendEmail(email,`welcome`,userName,token)
    return res.status(201).json({meessage:"success",user:createUser})
 
+}
+
+export const addUserExcel=async(req, res, next) =>{
+const workbook = xlsx.readFile(req.file.path)
+const worksheet = workbook.Sheets[workbook.SheetNames[0]]
+const users=xlsx.utils.sheet_to_json(worksheet)
+await userModel.insertMany(users)
+return res.json(workbook)
 }
 
 export const confirmEmail=async(req, res, next) =>{
