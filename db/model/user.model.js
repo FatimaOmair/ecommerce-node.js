@@ -7,6 +7,10 @@ const userSchema =new Schema({
     min:4,
     max:20
    },
+   isDeleted:{
+    type:Boolean,
+    default:false
+   },
    email:{
     type:String,
     required:true,
